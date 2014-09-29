@@ -2,14 +2,54 @@ PXL 2000 DECODER
     
     This is a *very* experimental decoder that converts raw PXL 2000 analog
     audio to a set of png frames and an audio wav file.  An external program
-    (like avconv) is required to combine the raw image and audio data into
-    a video format.  This app will create a sample avconv script that can be
-    used on Linux.  In theory, you may be able to take a very weak signal
+    (like avconv/ffmpeg) is required to combine the raw image and audio data 
+    into a video format.  This app will create a sample avconv script that can 
+    be used on Linux.  In theory, you may be able to take a very weak signal
     and boost/compress it to recover video data that will not play in a 
     PXL2000 camcorder.  
 
 
-AUDIO
+QUICKSTART
+
+	System Requirements:
+
+		Java JDK (6+) 
+		avconv (or ffmpeg) 
+
+    Note, if you don't have avconv, ffmpeg will also work as a drop-in 
+	replacement.  avconv is a fork of ffmpeg. 
+
+	To compile and package, use:
+
+        javac *.java
+        jar -cvfm PXLDecoder.jar MANIFEST.MF *.class
+
+	To run the app, use:
+
+        java -jar PXLDecoder.jar 
+
+	The graphical interface should launch by default.
+
+	Click "wav file"
+
+	Select the sample data file (included):
+
+		pxl2000_192khtz_section.wav
+	
+	Click "start/stop" (you can click this multiple times, and adjust tuning)
+	
+    Then, go to the capture/00001/ directory and run the avconv script
+    
+        bash convert.sh
+
+    The convert script will include the calculated frames per second.
+
+	The video willl be saved to a file named movie.flv
+
+    Code has been compiled and tested on Java 1.7.0_65.
+
+
+CONVERTING WAV FILES
 
     If using wav files, set the sample rate to 192khtz.  
 
@@ -19,26 +59,6 @@ AUDIO
 
     For a badly damaged signal, you'll get better audio sync if you decode 
     smaller sections of data at a time.
-
-
-OVERVIEW
-
-    TO COMPILE SOURCE:  You'll need a JDK.  Then compile and package with:
-
-        javac *.java
-        jar -cvfm PXLDecoder.jar MANIFEST.MF *.class
-
-    TO RUN: You'll need a Java runtime (JRE) and avconv
-
-        java  -jar PXLDecoder.jar $@
-
-    Then, go to the capture/ directory and run 
-    
-        bash convert.sh
-
-    The convert script will include the calculated frames per second.
-
-    Code has been compiled and tested on Java 1.7.0_65.
 
 
 USING THE GUI (DEFAULT INTERFACE)
@@ -115,6 +135,7 @@ FILES CREATED
 PXL DATA NOTES:
 
     Right track is data.
+
     Left track is audio.
 
     Tape speed in PXL 2000 is around 8x normal speed.
@@ -123,6 +144,7 @@ PXL DATA NOTES:
     A complete frame of data is around .55 seconds (normal speed).
 
     There are ~230 AM samples in one row of video, taking top and bottom of AM.
+
     There are ~91 rows in an image.
 
     Audio sampling at 192khtz to capture peaks in signal >10khtz.
