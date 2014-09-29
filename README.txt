@@ -83,6 +83,7 @@ COMMAND LINE INTERFACE/FLAGS
         --buffer_size <NUMBER>          set audio read buffer size
         --capture_dir  <STRING>         where data is saved 
         --theme <STRING>                Java Swing theme name
+		--max_frames <NUMBER>           Cap the number of frames created
 
     BOOLEAN DEBUG FLAGS (DUMP RAW DATA)
 
@@ -166,6 +167,10 @@ SAMPLE DATA
 
 		pxl2000_192khtz_frame.wav
 
+	And an example of a set of frames:
+
+		pxl2000_192khtz_section.wav		
+
 
 AUTHORS
 
@@ -173,6 +178,4 @@ AUTHORS
     Kevin Seifert (Java code, AM analysis)
     Mike Leslie (C code, FM analysis) 
 
-
-OPEN SOUCE/FREE SOFTWARE (GNU V3 LICENSE)
 

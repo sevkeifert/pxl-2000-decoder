@@ -15,7 +15,6 @@ import java.awt.image.*;
 import javax.imageio.*;
 
 // This is the decoder
-// ks 2014 GPL v3
 
 public class PXLDecoder implements Runnable {
     

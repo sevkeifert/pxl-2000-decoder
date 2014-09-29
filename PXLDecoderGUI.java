@@ -13,7 +13,6 @@ import java.text.*;
 import java.util.*;
 
 // This is the GUI (Swing)
-// ks 2014 GPL v3
 
 public class PXLDecoderGUI extends JPanel implements ActionListener { 
 

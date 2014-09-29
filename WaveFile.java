@@ -11,8 +11,6 @@ import javax.sound.sampled.*;
 //     short:    2 bytes little endian
 //
 // see http://ccrma.stanford.edu/courses/422/projects/WaveFormat/
-//
-// ks 2014 GPL v3 
 
 public class WaveFile {
 
