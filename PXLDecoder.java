@@ -63,7 +63,7 @@ public class PXLDecoder implements Runnable {
     int imagePtr = 0; // is frame sync
     long totalRows = 0;
     // image conversion
-    public int highLevel = 25000; // black cutoff
+    public int highLevel = 13000; // black cutoff
     public int lowLevel = 200; // white cutoff
 
     // analog signal state, increasing/decreasing?
@@ -102,7 +102,7 @@ public class PXLDecoder implements Runnable {
     float syncLevel = baseLine * 2 ;
     float syncLevelInertia = 1f/10f;  // small sync frame ~ 5 points 
     int syncDecayPerTick = 0; // general decay of tracking toward 0 
-    float signalTrip = 5.00f; // > multiple of base signal, trip boundary
+    float signalTrip = 3.00f; // > multiple of base signal, trip boundary
     int syncSizeThreshhold = 100; // make this number function of signal 
     public static final int freqScale = 2; // scale signal on slower frequency
     
