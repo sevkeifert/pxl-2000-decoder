@@ -19,14 +19,9 @@ QUICKSTART
     Note, if you don't have avconv, ffmpeg will also work as a drop-in 
     replacement.  avconv is a fork of ffmpeg. 
 
-    To compile and package, use:
+    To compile, package and run, use:
 
-        javac *.java
-        jar -cvfm PXLDecoder.jar MANIFEST.MF *.class
-
-    To run the app, use:
-
-        java -jar PXLDecoder.jar 
+		bash build.sh
 
     The graphical interface should launch by default.
 
