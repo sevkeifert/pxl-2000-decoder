@@ -1,0 +1,3 @@
+Manifest-Version: 1.0
+Main-Class: PXLDecoder
+Created-By: Kevin Seifert 2004
