@@ -11,40 +11,40 @@ PXL 2000 DECODER
 
 QUICKSTART
 
-	System Requirements:
+    System Requirements:
 
-		Java JDK (6+) 
-		avconv (or ffmpeg) 
+        Java JDK (6+) 
+        avconv (or ffmpeg) 
 
     Note, if you don't have avconv, ffmpeg will also work as a drop-in 
-	replacement.  avconv is a fork of ffmpeg. 
+    replacement.  avconv is a fork of ffmpeg. 
 
-	To compile and package, use:
+    To compile and package, use:
 
         javac *.java
         jar -cvfm PXLDecoder.jar MANIFEST.MF *.class
 
-	To run the app, use:
+    To run the app, use:
 
         java -jar PXLDecoder.jar 
 
-	The graphical interface should launch by default.
+    The graphical interface should launch by default.
 
-	Click "wav file"
+    Click "wav file"
 
-	Select the sample data file (included):
+    Select the sample data file (included):
 
-		pxl2000_192khtz_section.wav
-	
-	Click "start/stop" (you can click this multiple times, and adjust tuning)
-	
+        pxl2000_192khtz_section.wav
+    
+    Click "start/stop" (you can click this multiple times, and adjust tuning)
+    
     Then, go to the capture/00001/ directory and run the avconv script
     
         bash convert.sh
 
     The convert script will include the calculated frames per second.
 
-	The video willl be saved to a file named movie.flv
+    The video willl be saved to a file named movie.flv
 
     Code has been compiled and tested on Java 1.7.0_65.
 
@@ -103,7 +103,7 @@ COMMAND LINE INTERFACE/FLAGS
         --buffer_size <NUMBER>          set audio read buffer size
         --capture_dir  <STRING>         where data is saved 
         --theme <STRING>                Java Swing theme name
-		--max_frames <NUMBER>           Cap the number of frames created
+        --max_frames <NUMBER>           Cap the number of frames created
 
     BOOLEAN DEBUG FLAGS (DUMP RAW DATA)
 
@@ -185,13 +185,13 @@ SYNC PULSE DETECTION:
 
 SAMPLE DATA
 
-	This project includes one frame of sample data (picture of drumset):
+    This project includes one frame of sample data (picture of drumset):
 
-		pxl2000_192khtz_frame.wav
+        pxl2000_192khtz_frame.wav
 
-	And an example of a set of frames:
+    And an example of a set of frames:
 
-		pxl2000_192khtz_section.wav		
+        pxl2000_192khtz_section.wav        
 
 
 AUTHORS
