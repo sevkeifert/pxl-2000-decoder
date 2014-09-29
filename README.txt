@@ -21,7 +21,7 @@ QUICKSTART
 
     To compile, package and run, use:
 
-		bash build.sh
+        bash build.sh
 
     The graphical interface should launch by default.
 
