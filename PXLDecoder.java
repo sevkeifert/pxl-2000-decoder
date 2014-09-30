@@ -818,7 +818,7 @@ public class PXLDecoder implements Runnable {
         for ( int i = start ; i < data.length; i+=inc ) {
             ticksX ++; // 1-based count
             int value = data[i];
-            if ( ticksX >= maxTick ) {
+            if ( ! isSync && ticksX >= maxTick ) {
 
                 // lost signal. likely signal too low. add a sample point
                 peakData[peakDataCount] = value; 
@@ -1026,15 +1026,6 @@ public class PXLDecoder implements Runnable {
             // track ticks between sync
             syncLevel += ( absvalue - syncLevel ) * syncLevelInertia - syncDecayPerTick;
 
-            if ( isSync ) {
-                syncSize++;
-                //debug( " - syncLevel = " + syncLevel );
-
-            } else {
-
-                // save pixel data
-                colPtr++;    
-            } 
 
             if ( rowPtr >= height ) {
 
@@ -1063,6 +1054,16 @@ public class PXLDecoder implements Runnable {
                 // save data to image buffer
                 pixelData[colPtr][rowPtr] = pvalue; 
             }
+
+            if ( isSync ) {
+                syncSize++;
+                //debug( " - syncLevel = " + syncLevel );
+
+            } else {
+
+                // save pixel data
+                colPtr++;    
+            } 
         }
     }
 
