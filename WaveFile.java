@@ -70,6 +70,13 @@ public class WaveFile {
     }
 
     // int -> byte conversion
+	// NOTES:
+	//   Pass in an array of ints that represent the sound wave amplitude.
+	//   Each int value is a signed byte value between [-128, 128].
+	//   For a standard 16-bit stereo wav, alternate left-right bytes in int[].
+	//   The number of bytes per second depends on your sample rate:
+	//	 A common rate (CD) is 44,100 stereo (*2) samples per second.
+	//	 Another common rate is 48,000 stereo (*2) samples per second.
     public void write( int[] wavData, int size ) throws Exception {
 
         //log( totalSize + ": writing wav data int array, size =" + size );    
