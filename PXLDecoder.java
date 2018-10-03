@@ -924,13 +924,19 @@ public class PXLDecoder implements Runnable {
 
         for ( int i = 0 ; i < peakDeltaDataCount; i++ ) {
 
-            //int absvalue = Math.abs(value); 
-            int pvalue = Math.abs(peakDeltaData[i]); // raw pixel data
+            // raw pixel data
+            int pvalue = Math.abs(peakDeltaData[i]); 
 
             // note: sync signal slows down slightly.  
-            // scale value up by the larger tick counts between peaks
+            // data segments have 4-5 samples between peaks
+            // sync segments have 6-7 samples between peaks
             int ticks    = peakTickData[i];  
-            int amplifer = Math.pow((ticks - minTick) +1,freqScale);
+
+            // create amplifier  0: unlikely sync. 4: very likely sync.
+            // freqScale just adds more weight to frequency component.
+            int amplifer = Math.pow((ticks - minTick) +1, freqScale);
+
+            // find max in amplitude * frequency 
             int svalue   = peakDeltaData[i] * amplifer; 
             int absvalue = Math.abs(svalue); 
 
