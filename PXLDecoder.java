@@ -104,7 +104,7 @@ public class PXLDecoder implements Runnable {
     int syncDecayPerTick = 0; // general decay of tracking toward 0 
     float signalTrip = 3.00f; // > multiple of base signal, trip boundary
     int syncSizeThreshhold = 100; // make this number function of signal 
-    public static final int freqScale = 2; // scale signal on slower frequency
+    int freqScale = 2; // add more weight to frequency
     
     // get relative size of signal to baseLine... very high or low?
     float pov = 1f;  // peak over value
@@ -136,6 +136,7 @@ public class PXLDecoder implements Runnable {
         baseLineInertia = getAsFloat("base_inertia", baseLineInertia);
         syncLevelInertia = getAsFloat("sync_inertia", syncLevelInertia);
         bufferSize = getAsInt("buffer_size", bufferSize);
+        freqScale = getAsFloat("freqScale", freqScale);
 
         if ( DEBUG ) {
             debug("audio buffer size = " + bufferSize);
@@ -927,9 +928,10 @@ public class PXLDecoder implements Runnable {
             int pvalue = Math.abs(peakDeltaData[i]); // raw pixel data
 
             // note: sync signal slows down slightly.  
-            // scaled value up by the larger tick counts between peaks
+            // scale value up by the larger tick counts between peaks
             int ticks    = peakTickData[i];  
-            int svalue    = peakDeltaData[i] * (ticks - minTick)^freqScale;
+            int amplifer = Math.pow((ticks - minTick) +1,freqScale);
+            int svalue   = peakDeltaData[i] * amplifer; 
             int absvalue = Math.abs(svalue); 
 
             // discard bottom signal -- experimental
