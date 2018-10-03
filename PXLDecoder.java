@@ -104,7 +104,7 @@ public class PXLDecoder implements Runnable {
     int syncDecayPerTick = 0; // general decay of tracking toward 0 
     float signalTrip = 3.00f; // > multiple of base signal, trip boundary
     int syncSizeThreshhold = 100; // make this number function of signal 
-    int freqScale = 2; // add more weight to frequency
+    float freqScale = 2; // add more weight to frequency
     
     // get relative size of signal to baseLine... very high or low?
     float pov = 1f;  // peak over value
@@ -934,10 +934,10 @@ public class PXLDecoder implements Runnable {
 
             // create amplifier  0: unlikely sync. 4: very likely sync.
             // freqScale just adds more weight to frequency component.
-            int amplifer = Math.pow((ticks - minTick) +1, freqScale);
+            double amplifer = Math.pow((ticks - minTick) +1, freqScale);
 
             // find max in amplitude * frequency 
-            int svalue   = peakDeltaData[i] * amplifer; 
+            int svalue   = (int) ( peakDeltaData[i] * amplifer ); 
             int absvalue = Math.abs(svalue); 
 
             // discard bottom signal -- experimental
