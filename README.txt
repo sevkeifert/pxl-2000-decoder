@@ -83,6 +83,7 @@ COMMAND LINE INTERFACE/FLAGS
 
     VALUE OPTIONS:
 
+        --signalTrip <NUMBER>           signal ratio used to detect sync 
         --thread_sleep <NUMBER>         sleep between frames
         --min_tic <NUMBER>              how many samples between peaks
         --max_tick <NUMBER>             how many samples between peaks

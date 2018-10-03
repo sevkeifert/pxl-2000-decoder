@@ -14,7 +14,40 @@ import java.util.*;
 import java.awt.image.*;
 import javax.imageio.*;
 
-// This is the decoder
+
+
+/*
+This is the decoder
+
+I fine tuned the sync "circuit" by running a command in a loop, either by a rough calculation, or empirically -- where one variable is adjusted. 
+
+For example:
+
+    for x in 1 2 3 4 5
+    do
+      echo "---------------------------"
+      echo "x = $x"
+      ./build.sh -cli  \
+              --freqScale $x \
+              --capture_dir test \
+              --freqWindow 4 \
+              --signalTrip 3.5 \
+              pxl2000_192khtz_section.wav  
+    done > out.log
+
+Then look at the output for the sync misses:
+
+    processing...
+    image count: 68
+    total rows: 6189
+    missed sync: 49 (~0%)
+    baseline: 142618.34
+    sync signal: 64580.836
+    sec ~: 4.530272
+    fps ~: 15.010136
+    saved at: test/
+
+*/
 
 public class PXLDecoder implements Runnable {
     
@@ -102,10 +135,18 @@ public class PXLDecoder implements Runnable {
     float syncLevel = baseLine * 2 ;
     float syncLevelInertia = 1f/10f;  // small sync frame ~ 5 points 
     int syncDecayPerTick = 0; // general decay of tracking toward 0 
-    float signalTrip = 3.00f; // > multiple of base signal, trip boundary
+    float signalTrip = 3.50f; // > multiple of base signal, trip boundary
     int syncSizeThreshhold = 100; // make this number function of signal 
-    int freqScale = 2; // add more weight to frequency
-    
+
+    // frequency detection
+    // data segments have 4-5 samples between peaks
+    // sync segments have 6-7 samples between peaks
+    int freqWindow = 4; // how many samples to average out
+    int[] freqBuffer; // buffer for average
+    int freqIdx = 0;
+    int freqIdxMax = 0;
+    float freqScale = 3; // add more weight to frequency
+ 
     // get relative size of signal to baseLine... very high or low?
     float pov = 1f;  // peak over value
     float vob = 1f;  // value over baseLine
@@ -137,6 +178,10 @@ public class PXLDecoder implements Runnable {
         syncLevelInertia = getAsFloat("sync_inertia", syncLevelInertia);
         bufferSize = getAsInt("buffer_size", bufferSize);
         freqScale = getAsFloat("freqScale", freqScale);
+        freqWindow = getAsInt("freqWindow", freqWindow);
+        signalTrip = getAsFloat("signalTrip", signalTrip);
+
+        freqBuffer = new int[freqWindow]; // buffer for average
 
         if ( DEBUG ) {
             debug("audio buffer size = " + bufferSize);
@@ -927,17 +972,25 @@ public class PXLDecoder implements Runnable {
             // raw pixel data
             int pvalue = Math.abs(peakDeltaData[i]); 
 
-            // note: sync signal slows down slightly.  
-            // data segments have 4-5 samples between peaks
-            // sync segments have 6-7 samples between peaks
             int ticks    = peakTickData[i];  
 
-            // create amplifier  0: unlikely sync. 4: very likely sync.
+            // note: sync signal slows down slightly.  
+            // create amplifier for example:
+            //     1: very unlikely sync. 
+            //     2: unlikly sync. 
+            //     3: possibly sync. 
+            //     4: very likely sync.
+
+            // calculate "frequency"
+            setFreq(ticks);
+            float freqAvg = getFreqAvg();
+
             // freqScale just adds more weight to frequency component.
-            int amplifer = Math.pow((ticks - minTick) +1, freqScale);
+            //int amplifer = Math.pow((ticks - minTick) +1, freqScale);
+            double amplifer = Math.pow((freqAvg - minTick) +1, freqScale);
 
             // find max in amplitude * frequency 
-            int svalue   = peakDeltaData[i] * amplifer; 
+            int svalue   = (int)(peakDeltaData[i] * amplifer); 
             int absvalue = Math.abs(svalue); 
 
             // discard bottom signal -- experimental
@@ -1397,6 +1450,35 @@ public class PXLDecoder implements Runnable {
             ex.printStackTrace();
         }
     }
+
+
+
+    // maintain buffer to measure avg frequency of ticks between peaks (samples)
+    public void setFreq(int value) {
+        if ( value < minTick ) {
+            value = minTick; // ignore.  invalid value.
+        }
+        if ( value > maxTick ) {
+            value = minTick + 1; // ignore.  invalid value.
+        }
+        freqBuffer[freqIdx] = value;
+        freqIdx = ( freqIdx + 1) % freqBuffer.length;
+        if ( freqIdx > freqIdxMax ) {
+            freqIdxMax = freqIdx;
+        }
+    }
+
+
+    // get average "frequency" of buffer.
+    // should range from 4 to 7 samples
+    public float getFreqAvg() {
+        float sum = 0;
+        for ( int i = 0; i < freqIdxMax; i++) {
+            sum += freqBuffer[i];
+        }
+        return sum / freqIdxMax; // average 
+    }
+
 
 
 } // end class
