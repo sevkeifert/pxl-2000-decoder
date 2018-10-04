@@ -945,42 +945,48 @@ public class PXLDecoder implements Runnable {
             double amplifer = Math.pow((ticks - minTick) +1, freqScale);
 
             // now, find the max of amplitude * amplifier( 1/frequency )
-            int svalue   = (int) ( peakDeltaData[i] * amplifer ); 
-            int absvalue = Math.abs(svalue); 
+            int syncValue = (int) ( peakDeltaData[i] * amplifer ); 
+            int absSyncValue  = Math.abs(syncValue); 
 
             // discard bottom signal -- experimental
-            //if ( svalue < 0 ) continue;
+            //if ( syncValue < 0 ) continue;
  
             // track high signal for spike
             // only match on top half of wave
-            if ( svalue > syncLevel ){ 
+            if ( syncValue > syncLevel ){ 
                 // hit a high point
-                syncLevel = absvalue;
+                syncLevel = absSyncValue;
 
                 //if ( isSync ) {
                 //    // lock onto highest peak -- experimental 
                 //    colPtr = 0;
                 //}
-                //debug ( " - spike @ " + svalue  );
+                //debug ( " - spike @ " + syncValue  );
             }
 
-            // peak over svalue: shows start of sync
-            if ( absvalue != 0  ) {
-                //pov = syncLevel/svalue; // only match on top signal
-                pov = syncLevel/absvalue;
+            // peak over syncValue: shows start of sync
+            if ( absSyncValue != 0  ) {
+                //pov = syncLevel/syncValue; // only match on top signal
+                pov = syncLevel/absSyncValue;
             }
 
-            // svalue over baseLine: shows end of sync
+            // syncValue over baseLine: shows end of sync
             // get relative sizes
             if ( baseLine != 0  ) {
-                //vob = svalue /baseLine; // only top of signal
-                vob = absvalue /baseLine; 
+                //vob = syncValue /baseLine; // only top of signal
+                vob = absSyncValue /baseLine; 
             }
+
+			// fuzzy logic:
+			// now, detect "spikes" in the amplified sync signal,
+			// compared to the average rolling base lines signals.
 
             //debug ( "pov " + pov + " vob " + vob ) ;
             if ( vob > signalTrip ) {
 
                 // signal high
+                //debug( " - signal "+ absSyncValue +" over baseLine " +baseLine+" by " + vob );
+
                 if ( ! isSync && ( colPtr > maxRowNoSync || lostSync )) {
 
                     // row is at least half full, and we found a spike in the signal
@@ -992,16 +998,15 @@ public class PXLDecoder implements Runnable {
 
                 }
 
-                //debug( " - signal "+ absvalue +" over baseLine " +baseLine+" by " + vob );
 
             } else if ( pov > signalTrip ) {
 
                 // signal is very low, found possible spike end  
-                //debug( " - signal "+ absvalue +" under syncLevel " + syncLevel +" by " + pov );
+                //debug( " - signal "+ absSyncValue +" under syncLevel " + syncLevel +" by " + pov );
 
                 if ( isSync ) {
 
-                    //debug( "----------------------- trip end @ (syncSize="+syncSize+") -----------------------" ) ;
+                    //debug( "----------------------- trip end @ (syncSize="+syncSize+") ------" ) ;
 
                     // completed row or image 
                     if ( syncSize > syncSizeThreshhold ) {
@@ -1030,18 +1035,23 @@ public class PXLDecoder implements Runnable {
                 //baseLinePeakHigh = baseLine; // reset peak
             } 
 
-            // experimental ignore high outliers, want baseline to decay to zero
-            // otherwise, just set a high inertia for the baseline
-            //    if ( vob < signalTrip ) {
-                    // track average baseLine of row, image signal    
-            baseLine += (absvalue - baseLine) * baseLineInertia; // short baseLine
-            //    }    
+			// the "base lines" are used to determine what is considered "high" or "low."
+			// track average (base line) of image signal, and the sync signal.
+            // base line will decay to zero, if there is no input.
 
-            //debug ( colPtr +  ": data " + svalue + " baseLine " +baseLine + " syncLevel " + syncLevel + " vob " + vob + " pov " + pov );
+            // experimental: ignore high outliers, 
+            // otherwise, just set a high inertia for the baseline
+            // if ( vob < signalTrip ) {
+
+            baseLine += (absSyncValue - baseLine) * baseLineInertia; // short baseLine
+
+            // }    
     
             // track ticks between sync
-            syncLevel += ( absvalue - syncLevel ) * syncLevelInertia - syncDecayPerTick;
+            syncLevel += (absSyncValue - syncLevel) * syncLevelInertia - syncDecayPerTick;
 
+
+            //debug ( colPtr +  ": data " + syncValue + " baseLine " +baseLine + " syncLevel " + syncLevel + " vob " + vob + " pov " + pov );
 
             if ( rowPtr >= height ) {
 
