@@ -927,16 +927,24 @@ public class PXLDecoder implements Runnable {
             // raw pixel data
             int pvalue = Math.abs(peakDeltaData[i]); 
 
+            // SYNC PULSE DETECTION:
             // note: sync signal slows down slightly.  
             // data segments have 4-5 samples between peaks
             // sync segments have 6-7 samples between peaks
             int ticks    = peakTickData[i];  
 
-            // create amplifier  0: unlikely sync. 4: very likely sync.
-            // freqScale just adds more weight to frequency component.
+            // TODO:
+            // as noted by mwturvey, using a FFT can 
+            //     be more accurate here for finding 15khz sync pulses.
+            //
+            // this is just creating an amplifier based on 1/frequncy. 
+            // it has the properties:
+            //     low number: unlikely sync. 
+            //     high number: very likely sync.
+            //     freqScale: just adds more weight to frequency component.
             double amplifer = Math.pow((ticks - minTick) +1, freqScale);
 
-            // find max in amplitude * frequency 
+            // now, find the max of amplitude * amplifier( 1/frequency )
             int svalue   = (int) ( peakDeltaData[i] * amplifer ); 
             int absvalue = Math.abs(svalue); 
 
